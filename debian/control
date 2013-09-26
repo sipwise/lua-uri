@@ -1,0 +1,32 @@
+Source: lua-uri
+Section: interpreters
+Priority: optional
+Maintainer: Victor Seva <linuxmaniac@torreviejawireless.org>
+Build-Depends: debhelper (>= 8~), dh-lua (>= 16~)
+Standards-Version: 3.9.4
+Vcs-Git: git://git.debian.org/git/pkg-lua/lua-uri.git
+Vcs-Browser: http://git.debian.org/?p=pkg-lua/lua-uri.git
+Homepage: http://www.geoffrichards.co.uk/lua/uri/
+
+Package: lua-uri
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: ${lua:Provides}
+XB-Lua-Versions: ${lua:Versions}
+Description: pure Lua library to normalize and validate URIs/URLs
+ Provides methods for manipulating URIs in various ways.
+ In particular, you can resolve relative URI references
+ to create absolute URIs, and extract parts of URIs.
+
+Package: lua-uri-dev
+Section: libdevel
+Architecture: any
+Depends: lua-uri (= ${binary:Version}), ${misc:Depends}
+Provides: ${lua:Provides}
+XB-Lua-Versions: ${lua:Versions}
+Description:pure Lua library to normalize and validate URIs/URLs
+ Provides methods for manipulating URIs in various ways.
+ In particular, you can resolve relative URI references
+ to create absolute URIs, and extract parts of URIs.
+ .
+ This package contains examples and test files.

@@ -1,0 +1,5 @@
+lua-uri (0.1+20130926+git14fa255d-1) unstable; urgency=low
+
+  * Initial release (Closes: #724679)
+
+ -- Victor Seva <linuxmaniac@torreviejawireless.org>  Thu, 26 Sep 2013 17:21:34 +0200
