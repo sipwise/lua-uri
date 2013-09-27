@@ -1,0 +1,241 @@
+From 291f464f227d61a425873bbf5424a886f7f32ebb Mon Sep 17 00:00:00 2001
+From: Victor Seva <vseva@sipwise.com>
+Date: Fri, 27 Sep 2013 12:40:25 +0200
+Subject: [PATCH] sip URI
+
+---
+ test/sip.lua |  106 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ uri/sip.lua  |  107 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 213 insertions(+)
+ create mode 100644 test/sip.lua
+ create mode 100644 uri/sip.lua
+
+diff --git a/test/sip.lua b/test/sip.lua
+new file mode 100644
+index 0000000..2044114
+--- /dev/null
++++ b/test/sip.lua
+@@ -0,0 +1,106 @@
++require "uri-test"
++local URN = require "uri"
++
++module("test.sip", lunit.testcase, package.seeall)
++
++function test_sip1 ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2", uri:uri())
++    is("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2", tostring(uri))
++    is("uri.sip", uri._NAME)
++    is("sip", uri:scheme())
++end
++
++function test_sip2 ()
++    local uri = assert(URN:new("sip:alice@atlanta.com?subject=project%20x&priority=urgent"))
++    is("sip:alice@atlanta.com:5060?subject=project%20x&priority=urgent", uri:uri())
++    is("sip:alice@atlanta.com:5060?subject=project%20x&priority=urgent", tostring(uri))
++    is("uri.sip", uri._NAME)
++    is("sip", uri:scheme())
++    is("atlanta.com", uri:host())
++    is("alice", uri:username())
++    is("subject=project%20x&priority=urgent", uri:query())
++end
++
++function test_sip_port ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is(5061, uri:port())
++end
++
++function test_sip_default_port ()
++    local uri = assert(URN:new("sip:username1@domain.com;user=phone?header1=value1&header2=value2"))
++    is(5060, uri:port())
++    is("domain.com", uri:host())
++    is("username1", uri:username())
++    is("sip:username1@domain.com:5060;user=phone?header1=value1&header2=value2", uri:uri())
++end
++
++function test_sip_domain ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is("domain.com", uri:host())
++end
++
++function test_sip_host_ipv6_simple ()
++    local uri = assert(URN:new("sip:username1@[2620:0:2ef0:7070:250:60ff:fe03:32b7]"))
++    is("[2620:0:2ef0:7070:250:60ff:fe03:32b7]", uri:host())
++end
++
++function test_sip_host_ipv6 ()
++    local uri = assert(URN:new("sip:username1@[2001:cdba:0000:0000:0000:0000:3257:9652]:5061;user=phone?header1=value1&header2=value2"))
++    is("[2001:cdba:0000:0000:0000:0000:3257:9652]", uri:host())
++end
++
++function test_sip_host_ipv4 ()
++    local uri = assert(URN:new("sip:username1@192.168.0.1:5061;user=phone?header1=value1&header2=value2"))
++    is("192.168.0.1", uri:host())
++end
++
++function test_sip_path ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is(nil, uri:path())
++end
++
++function test_sip_fragment ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is("user=phone", uri:fragment())
++end
++
++
++function test_sip_username ()
++    local uri = assert(URN:new("sip:username1@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is("username1", uri:username())
++end
++
++function test_sip_username_password ()
++    local uri = assert(URN:new("sip:username1:pass@domain.com:5061;user=phone?header1=value1&header2=value2"))
++    is("username1", uri:username())
++    is("pass", uri:password())
++end
++
++function test_sip_paramters ()
++    local uri = assert(URN:new("sip:username1@domain.com;user=phone;other=value;?header1=value1&header2=value2"))
++    is(5060, uri:port())
++    is("domain.com", uri:host())
++    is("username1", uri:username())
++    is("sip:username1@domain.com:5060;user=phone;other=value?header1=value1&header2=value2", uri:uri())
++end
++
++function test_sip_paramters_set ()
++    local uri = assert(URN:new("sip:username1@domain.com;user=phone"))
++    is(5060, uri:port())
++    is("domain.com", uri:host())
++    is("username1", uri:username())
++    uri:query("header1=value1&header2=value2")
++    is("sip:username1@domain.com:5060;user=phone?header1=value1&header2=value2", uri:uri())
++end
++
++function test_set ()
++    local uri = assert(URN:new("sip:username1@domain.com;user=phone"))
++    is("sip:alice@atlanta.com:5060?subject=project%20x&priority=urgent", uri:uri("sip:alice@atlanta.com?subject=project%20x&priority=urgent"))
++    is("sip:alice@atlanta.com:5060?subject=project%20x&priority=urgent", tostring(uri))
++    is("uri.sip", uri._NAME)
++    is("sip", uri:scheme())
++    is("atlanta.com", uri:host())
++    is("alice", uri:username())
++    is("subject=project%20x&priority=urgent", uri:query())
++end
+\ No newline at end of file
+diff --git a/uri/sip.lua b/uri/sip.lua
+new file mode 100644
+index 0000000..446d55d
+--- /dev/null
++++ b/uri/sip.lua
+@@ -0,0 +1,107 @@
++local M = { _NAME = "uri.sip" }
++local Util = require "uri._util"
++local LoginURI = require "uri._login"
++Util.subclass_of(M, LoginURI)
++
++local _UNRESERVED = "A-Za-z0-9%-._~"
++local _SUB_DELIMS = "!$&'()*+,;="
++local _USERINFO = "^[" .. _UNRESERVED .. "%%" .. _SUB_DELIMS .. ":]*$"
++
++function M.default_port () return 5060 end
++
++-- sip:<user>[:<password>]@<host>[:<port>][;<uri-parameters>][?<headers>]
++-- This implements RFC 2141, and attempts to change the class of the URI object
++-- to one of its subclasses for further validation and normalization of the
++-- namespace-specific string.
++
++local function _validate_and_normalize_path(path)
++    local s, userinfo, port, host, fragment, lp
++    local _, p, authority = path:find("^([^@]+)@")
++    if authority then
++        s = path:sub(p + 1)
++
++        _, p, userinfo = authority:find("^([^@]*)")
++        if userinfo then
++            if not userinfo:find(_USERINFO) then
++                return nil, "invalid userinfo value '" .. userinfo .. "'"
++            end
++            authority = authority:sub(p + 1)
++        end
++        _, p, host = s:find("(%[.*%])")
++        if host then s = s:sub(p + 1); host = 'v6' .. host end
++        p, lp, port = s:find(":([0-9]*)")
++        if port then
++            port = (port ~= "") and tonumber(port) or nil
++            fragment = s:sub(lp+2)
++            s = s:sub(1, p - 1)
++        else
++            p, lp, fragment = s:find(";([^/?]+)$")
++            if fragment then
++                s = s:sub(1, p - 1)
++            end
++        end
++        if not host then host = s:lower() end
++    end
++    return userinfo, host, port, fragment
++end
++
++function M.init (self)
++    local userinfo, host, port, fragment = _validate_and_normalize_path(self._path)
++    M._SUPER.userinfo(self, userinfo)
++    M._SUPER.host(self, host)
++    M._SUPER.port(self, port)
++    M._SUPER.fragment(self, fragment)
++    self._path = nil
++    local err
++    self, err = M._SUPER.init_base(self)
++    if not self then return nil, err end
++    return self
++end
++
++function M.uri (self, ...)
++    if select("#", ...) > 0 then
++        local new = ...
++        if not new then error("URI can't be set to nil", 2) end
++        local newuri, err = M:new(new)
++        if not newuri then
++            error("new URI string is invalid (" .. err .. ")", 2)
++        end
++        setmetatable(self, getmetatable(newuri))
++        for k in pairs(self) do self[k] = nil end
++        for k, v in pairs(newuri) do self[k] = v end
++    end
++    local uri = self._uri
++    if not uri then
++        local scheme = self:scheme()
++        if scheme then
++            uri = scheme .. ":"
++        else
++            uri = ""
++        end
++
++        local host, port, userinfo = self:host(), self:port(), self:userinfo()
++        if host or port or userinfo then
++            if userinfo then uri = uri .. userinfo .. "@" end
++            if host then uri = uri .. host end
++            if port then uri = uri .. ":" .. port end
++            if self:fragment() then
++                uri = uri .. ";" .. self:fragment()
++                -- fragment with ';' at last position??
++                if uri:sub(-1)==';' then
++                    uri = uri:sub(1,uri:len()-1)
++                end
++            end
++
++        end
++
++        if self:query() then uri = uri .. "?" .. self:query() end
++        self._uri = uri     -- cache
++    end
++
++    return uri
++end
++
++Util.uri_part_not_allowed(M, "path")
++
++return M
++-- vi:ts=4 sw=4 expandtab
+-- 
+1.7.10.4
+
