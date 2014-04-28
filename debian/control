@@ -1,7 +1,7 @@
 Source: lua-uri
 Section: interpreters
 Priority: optional
-Maintainer: Victor Seva <linuxmaniac@torreviejawireless.org>
+Maintainer: Sipwise Development Team <support@sipwise.com>
 Build-Depends: debhelper (>= 8~), dh-lua (>= 16~)
 Standards-Version: 3.9.4
 Vcs-Git: git://git.debian.org/git/pkg-lua/lua-uri.git
