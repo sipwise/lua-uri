@@ -1,3 +1,9 @@
+lua-uri (0.1+20130926+git14fa255d-1.1+0~mr3.5.1.0) unstable; urgency=low
+
+  * New release.
+
+ -- Sipwise Jenkins Builder <jenkins@sipwise.com>  Thu, 09 Oct 2014 16:33:22 +0200
+
 lua-uri (0.1+20130926+git14fa255d-1.1+0~mr3.5.0.0) unstable; urgency=low
 
   * New release.
